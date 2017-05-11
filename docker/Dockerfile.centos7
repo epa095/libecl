@@ -1,0 +1,24 @@
+#DOES NOT WORK, there is some issue with python path or somethin, all the python tests fails.
+FROM centos:7
+#RUN yum install -y cmake gcc valgrind liblapack-dev g++ wget bzip2
+RUN yum group install -y "Development Tools" && yum install -y valgrind liblapack-dev wget bzip2 cmake
+
+RUN wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+RUN bash miniconda.sh -b -p root/miniconda
+ENV CONDA_HOME="/root/miniconda"
+ENV PATH="${CONDA_HOME}/bin:${PATH}"
+RUN hash -r
+RUN conda config --set always_yes yes --set changeps1 no
+RUN conda update -q conda
+RUN conda info -a  # Useful for debugging any issues with conda
+RUN conda install pylint numpy pandas
+
+ENV CXX="g++"
+
+COPY . /usr/src/libecl
+RUN mkdir /usr/src/libecl/build
+WORKDIR /usr/src/libecl/build
+RUN cmake -DBUILD_TESTS=ON -DBUILD_PYTHON=ON -DERT_BUILD_CXX=ON -DBUILD_APPLICATIONS=ON -DINSTALL_ERT_LEGACY=ON ..
+RUN make
+RUN mkdir /usr/lib/testing 
+CMD ["bash"]
