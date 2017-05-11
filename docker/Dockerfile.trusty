@@ -1,3 +1,5 @@
+#To build this run from the docker-folder: "sudo docker build -t libecl-trusty -f Dockerfile.trusty  ../"
+#To get a shell after it is buildt run: "sudo docker run -it --rm --name libecl-trusty libecl-trusty"
 FROM ubuntu:trusty
 LABEL maintainer "eparmann@gmail.com"
 RUN apt-get update && apt-get install -y valgrind liblapack-dev wget bzip2 cmake gcc-4.8 g++-4.8
