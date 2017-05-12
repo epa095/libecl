@@ -28,5 +28,8 @@ RUN mkdir -p /home/user/libecl/build
 WORKDIR /home/user/libecl/build
 RUN cmake -DBUILD_TESTS=ON -DBUILD_PYTHON=ON -DERT_BUILD_CXX=ON -DBUILD_APPLICATIONS=ON -DINSTALL_ERT_LEGACY=ON ..
 RUN make
+USER root
+RUN make install
+USER user
 
 CMD ["bash"]
