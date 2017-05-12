@@ -6,19 +6,27 @@ RUN apt-get update && apt-get install -y valgrind liblapack-dev wget bzip2 cmake
 
 RUN adduser --disabled-password user --gecos ''
 USER user
-
+WORKDIR /home/user
 #installing python and python packages
-RUN wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh && bash miniconda.sh -b -p /home/user/miniconda
+RUN whoami
+RUN echo $HOME
+RUN pwd
+RUN wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+RUN bash miniconda.sh -b -p /home/user/miniconda
 ENV CONDA_HOME=/home/user/miniconda"
 ENV PATH="${CONDA_HOME}/bin:${PATH}"
 RUN hash -r && conda config --set always_yes yes --set changeps1 no && conda update -q conda && conda info -a && conda install pylint numpy pandas
 
 ENV CXX="g++-4.8"
-COPY . /usr/src/libecl
-RUN mkdir /usr/src/libecl/build
-WORKDIR /usr/src/libecl/build
+COPY . /home/user/libecl
+
+USER root
+RUN chown -R user:user /home/user/libecl
+USER user
+
+RUN mkdir -p /home/user/libecl/build
+WORKDIR /home/user/libecl/build
 RUN cmake -DBUILD_TESTS=ON -DBUILD_PYTHON=ON -DERT_BUILD_CXX=ON -DBUILD_APPLICATIONS=ON -DINSTALL_ERT_LEGACY=ON ..
 RUN make
-#Need the following to make all tests pass, a bit odd
-RUN mkdir /usr/lib/testing 
+
 CMD ["bash"]
